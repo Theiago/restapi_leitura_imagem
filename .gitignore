@@ -10,3 +10,9 @@ dist/
 # Logs
 logs
 *.log
+
+# Test Files
+test_json.json
+test.sh
+
+/uploads/*
