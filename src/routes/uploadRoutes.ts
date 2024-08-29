@@ -5,6 +5,7 @@ import { saveImage } from '../services/processImage';
 
 const router = Router();
 
+// Validação de dados do request
 function validateData(body: any) {
 
     if (typeof body.image !== 'string') {
@@ -28,6 +29,7 @@ function validateData(body: any) {
 router.post('/', async (req, res) => {
     const { image, customer_code, measure_datetime, measure_type } = req.body;
 
+    // Confere se todos dados são válidos
     try {
         validateData(req.body);
     } catch (error) {
@@ -39,8 +41,10 @@ router.post('/', async (req, res) => {
     }
 
     try {
+        // Chamada  da função responsável por extrair o texto da imagem
         const readValue = await findText(image)
 
+        // Confere se já foi realizada a leitura naquele mês
         const checkReadings = await checkMonthReadings(customer_code, measure_datetime, measure_type)
         
         if (!checkReadings) {
@@ -50,9 +54,11 @@ router.post('/', async (req, res) => {
             })
             return
         }
-
+        
+        // Insere as informações no banco de dados e retorna as informações para serem usadas no response
         const result = await insertMeasure(image, customer_code, measure_datetime, measure_type, parseInt(readValue))
 
+        // Salva a imagem no disco localmente
         const image_url = saveImage(result.image, result.measure_uuid)
 
         res.status(200).json({

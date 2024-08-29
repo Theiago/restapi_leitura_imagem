@@ -8,6 +8,7 @@ const pool = new Pool({
     port: 5432,
 });
 
+// Função para inicializar o banco de dados
 export async function initDatabase() {
     try {
 
@@ -28,18 +29,21 @@ export async function initDatabase() {
     }
 }
 
-
+// Função para conferir se a leitura já foi feita no mês especifico
 export async function checkMonthReadings(customer_code: string, datetime: string, measure_type: string) {
 
     const date = new Date(datetime)
     const month = date.getMonth() + 1
+    const year = date.getFullYear() 
     const query = `SELECT customer_code
                 FROM leituras
                 WHERE customer_code = $1
                  AND measure_type = $2
-                 AND EXTRACT(MONTH FROM measure_datetime) = $3;`
+                 AND EXTRACT(MONTH FROM measure_datetime) = $3
+                 AND EXTRACT(YEAR FROM measure_datetime) = $4;
+                 `
 
-    const values = [customer_code, measure_type, month]
+    const values = [customer_code, measure_type, month, year]
 
     const result = await pool.query(query, values)
 
