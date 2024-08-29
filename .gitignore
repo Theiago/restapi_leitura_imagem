@@ -11,6 +11,8 @@ dist/
 logs
 *.log
 
+.env
+
 # Test Files
 test_json.json
 test.sh

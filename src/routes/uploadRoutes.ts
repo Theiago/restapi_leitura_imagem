@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { findText } from '../services/geminiService';
 import { checkMonthReadings, insertMeasure } from '../models/db';
-import { saveImage } from '../services/processImage';
 
 const router = Router();
 
@@ -41,9 +40,6 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Chamada  da função responsável por extrair o texto da imagem
-        const readValue = await findText(image)
-
         // Confere se já foi realizada a leitura naquele mês
         const checkReadings = await checkMonthReadings(customer_code, measure_datetime, measure_type)
         
@@ -55,14 +51,15 @@ router.post('/', async (req, res) => {
             return
         }
         
+        // Chamada  da função responsável por extrair o texto da imagem
+        const readValue = await findText(image)
         // Insere as informações no banco de dados e retorna as informações para serem usadas no response
         const result = await insertMeasure(image, customer_code, measure_datetime, measure_type, parseInt(readValue))
 
         // Salva a imagem no disco localmente
-        const image_url = saveImage(result.image, result.measure_uuid)
 
         res.status(200).json({
-            "image_url": `http://${req.hostname}${image_url}`,
+            "image_url": `http://${req.hostname}/images/${result.measure_uuid}`,
             "measure_value": parseInt(readValue),
             "measure_uuid": result.measure_uuid
         })

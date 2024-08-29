@@ -34,7 +34,7 @@ export async function checkMonthReadings(customer_code: string, datetime: string
 
     const date = new Date(datetime)
     const month = date.getMonth() + 1
-    const year = date.getFullYear() 
+    const year = date.getFullYear()
     const query = `SELECT customer_code
                 FROM leituras
                 WHERE customer_code = $1
@@ -53,6 +53,7 @@ export async function checkMonthReadings(customer_code: string, datetime: string
     return true
 }
 
+// Função para inserir as leituras no banco de dados
 export async function insertMeasure(image: string, customer_code: string, measure_datetime: string, measure_type: string, measure_value: number) {
     const result = await pool.query(`INSERT INTO leituras (image, customer_code, measure_datetime, measure_type, measure_value)
                 VALUES ('${image}', '${customer_code}', '${measure_datetime}', '${measure_type}', ${measure_value})
@@ -63,7 +64,15 @@ export async function insertMeasure(image: string, customer_code: string, measur
 
 }
 
+export async function getImageById(measure_uuid: string) {
+    const query = `SELECT image FROM leituras WHERE measure_uuid = $1`
+    const values = [measure_uuid]
 
+    const result = await pool.query(query, values)
+    return result.rows[0].image
+}
+
+// Função de query genérica
 export const query = (text: string, params?: any[]) => {
     return pool.query(text, params);
 };
