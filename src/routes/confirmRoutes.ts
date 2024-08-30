@@ -56,7 +56,7 @@ export async function confirm(req: any, res: any) {
     if (result) {
         res.status(200).json(
             {
-                sucess: true
+                success: true
             })
     }
 }
