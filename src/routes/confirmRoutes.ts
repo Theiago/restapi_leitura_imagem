@@ -4,8 +4,6 @@ function validateData(body: any) {
     // Fonte Regex: https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex
     const regex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
     const isUuid = regex.test(body.measure_uuid)
-    
-    console.log(isUuid)
 
     if (!isUuid) {
         throw new Error('Um uuid não foi informado')

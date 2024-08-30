@@ -2,7 +2,13 @@ import { getMeasuresFromCustomerCode } from "../models/db";
 
 export async function listMeasures(req: any, res: any) {
     const { customerCode } = req.params;
-    const measureType = req.query.measure_type?.toString().toLowerCase();
+
+    const measureTypeKey = Object.keys(req.query).find(key => key.toLowerCase() === 'measure_type');
+    let measureType;
+    if (measureTypeKey) {
+        measureType = req.query[measureTypeKey].toString().toLowerCase();
+    }
+
 
     if (measureType && measureType !== "water" && measureType !== "gas") {
         return res.status(400).json({
@@ -13,8 +19,7 @@ export async function listMeasures(req: any, res: any) {
 
     const measureList = await getMeasuresFromCustomerCode(customerCode, measureType)
 
-    if (!measureList.length)
-    {
+    if (!measureList.length) {
         return res.status(404).json({
             error_code: "MEASURES_NOT_FOUND",
             error_description: "Nenhuma leitura encontrada"

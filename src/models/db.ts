@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 
 const pool = new Pool({
     user: 'admin',
-    host: 'localhost',
+    host: 'db',
     database: 'postgres',
     password: 'foo',
     port: 5432,
@@ -23,6 +23,8 @@ export async function initDatabase() {
               confirmed boolean DEFAULT false
             );
           `);
+
+        console.log("Database inicializada com sucesso.")
 
     } catch (error) {
         console.error('Erro ao inicializar o banco de dados:', error);
@@ -93,7 +95,7 @@ export async function getMeasuresFromCustomerCode(customer_code: string, measure
 
     if (measure_type) {
         query += ` AND LOWER(measure_type) = LOWER($2)`
-        values.push(measure_type)
+        values.push(measure_type.toLowerCase())
     }
 
     query += `;`

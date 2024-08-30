@@ -51,6 +51,7 @@ export async function upload(req: any, res: any) {
         
         // Chamada  da função responsável por extrair o texto da imagem
         const readValue = await findText(image)
+
         // Insere as informações no banco de dados e retorna as informações para serem usadas no response
         const result = await insertMeasure(image, customer_code, measure_datetime, measure_type, parseInt(readValue))
 

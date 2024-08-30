@@ -1,4 +1,4 @@
-import { getImageById } from "../models/db"
+import { getImageById, getMeasureFromUuid } from "../models/db"
 
 
 export function determineFileFormat(base64: string) {
@@ -29,8 +29,15 @@ async function decodeToBinary(userId: string) {
 
 export async function imageUrl(req: any, res: any) {
     const { id } = req.params;
-    const image = await decodeToBinary(id);
-    
-    res.setHeader('Content-Type', `image/${image.fileFormat}`);
-    res.send(image.file)
+
+    try {
+        const idExists = await getMeasureFromUuid(id)
+
+        const image = await decodeToBinary(id);
+
+        res.setHeader('Content-Type', `image/${image.fileFormat}`);
+        res.send(image.file)
+    } catch (error) {
+        res.status(404).json({ "error_description": "FILE_NOT_FOUND" });
+    }
 }
