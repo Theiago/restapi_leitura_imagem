@@ -1,10 +1,11 @@
 import express from 'express';
-import { getImageById, initDatabase } from './models/db';
+import { initDatabase } from './models/db';
 
-import uploadRoutes from './routes/uploadRoutes';
 import dotenv from 'dotenv';
-import { decodeToBinary } from './routes/imageRoutes';
-import confirmRoutes from './routes/confirmRoutes';
+import { imageUrl } from './routes/imageRoutes';
+import { listMeasures } from './routes/getRoutes';
+import { upload } from './routes/uploadRoutes';
+import { confirm } from './routes/confirmRoutes';
 
 dotenv.config();
 const app = express();
@@ -16,21 +17,13 @@ app.use(express.json({limit: '10mb'}));
 initDatabase();
 
 // Permitir upload de arquivos
-app.use('/upload', uploadRoutes);
+app.post('/upload', upload);
 
-app.use('/confirm', confirmRoutes);
+app.patch('/confirm', confirm);
 
-// Rota para a pasta de uploads
-app.use('/uploads', express.static('uploads'));
+app.get('/images/:id', imageUrl)
 
-app.use('/images/:id', async (req, res) => {
-  const { id } = req.params;
-
-  const image = await decodeToBinary(id);
-
-  res.setHeader('Content-Type', `image/${image.fileFormat}`);
-  res.send(image.file)
-});
+app.get('/:customerCode/list', listMeasures);
 
 app.get('/', (req, res) => {
   res.send("Hello World");

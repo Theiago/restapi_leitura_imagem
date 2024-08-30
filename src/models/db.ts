@@ -55,10 +55,10 @@ export async function checkMonthReadings(customer_code: string, datetime: string
 
 // Função para inserir as leituras no banco de dados
 export async function insertMeasure(image: string, customer_code: string, measure_datetime: string, measure_type: string, measure_value: number) {
-    const result = await pool.query(`INSERT INTO leituras (image, customer_code, measure_datetime, measure_type, measure_value)
-                VALUES ('${image}', '${customer_code}', '${measure_datetime}', '${measure_type}', ${measure_value})
-                RETURNING *
-    `)
+    const query = `INSERT INTO leituras (image, customer_code, measure_datetime, measure_type, measure_value)
+                    VALUES ($1, $2, $3, $4, $5) RETURNING *`
+    const values = [image, customer_code, measure_datetime, measure_type, measure_value]
+    const result = await pool.query(query, values)
 
     return result.rows[0];
 
@@ -71,6 +71,57 @@ export async function getImageById(measure_uuid: string) {
     const result = await pool.query(query, values)
     return result.rows[0].image
 }
+
+export async function getMeasureFromUuid(measure_uuid: string) {
+    const query = `SELECT customer_code, measure_datetime, measure_type, measure_value, confirmed
+                    FROM leituras 
+                    WHERE measure_uuid = $1;
+                    `
+
+    const values = [measure_uuid]
+
+    const result = await pool.query(query, values)
+
+    return result.rows[0]
+
+}
+
+export async function getMeasuresFromCustomerCode(customer_code: string, measure_type?: string) {
+
+    let query = `SELECT measure_uuid, measure_datetime, measure_type, confirmed FROM leituras WHERE customer_code = $1`
+    const values = [customer_code]
+
+    if (measure_type) {
+        query += ` AND LOWER(measure_type) = LOWER($2)`
+        values.push(measure_type)
+    }
+
+    query += `;`
+
+    const result = await pool.query(query, values);
+    return result.rows
+
+}
+
+export async function updateMeasure(measure_uuid: string, measure_value: number) {
+
+    const taken_measure = await getMeasureFromUuid(measure_uuid);
+
+    let query = `UPDATE leituras SET confirmed = true`
+    const values = [measure_uuid]
+
+    if (measure_value != taken_measure.measure_value) {
+        query += `, measure_value = $2`;
+        values.push(String(measure_value));
+    }
+
+    query += ` WHERE measure_uuid = $1 RETURNING confirmed;`
+
+    const result = await pool.query(query, values)
+
+    return result.rows[0].confirmed
+}
+
 
 // Função de query genérica
 export const query = (text: string, params?: any[]) => {

@@ -2,8 +2,6 @@ import { Router } from 'express';
 import { findText } from '../services/geminiService';
 import { checkMonthReadings, insertMeasure } from '../models/db';
 
-const router = Router();
-
 // Validação de dados do request
 function validateData(body: any) {
 
@@ -25,7 +23,7 @@ function validateData(body: any) {
 
 }
 
-router.post('/', async (req, res) => {
+export async function upload(req: any, res: any) {
     const { image, customer_code, measure_datetime, measure_type } = req.body;
 
     // Confere se todos dados são válidos
@@ -66,8 +64,4 @@ router.post('/', async (req, res) => {
     } catch (error) {
         res.status(500).json(error);
     }
-
-
-});
-
-export default router;
+}
