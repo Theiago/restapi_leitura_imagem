@@ -10,9 +10,6 @@ services:
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - DATABASE_URL=postgres://user:password@db:5432/mydatabase
-    volumes:
-      - .:/app
-    command: npx ts-node src/app.ts
 
   db:
     image: postgres:13
