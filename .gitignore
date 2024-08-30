@@ -11,10 +11,10 @@ dist/
 logs
 *.log
 
+#Env e VSCode
 .env
+.vscode
 
 # Test Files
 test_json.json
 test.sh
-
-/uploads/*
